@@ -98,7 +98,7 @@ export default function Home() {
 
   const addBookmark = async (link) => {
   // 1️⃣ Get logged-in user
-  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  const { data: {  }, error: userError } = await supabase.auth.getUser();
 
   if (userError || !user) {
     console.log("User not logged in");
@@ -106,11 +106,12 @@ export default function Home() {
   }
 
   // 2️⃣ Insert bookmark with user_id
-  const { data, error } = await supabase
-    .from("bookmark")
-    .insert([
+  const { data:  { user }} = await supabase.auth.getUser();
+
+  await supabase.from("bookmark").insert([
       {
-        url: link,
+        title:title,
+        url: url,
         user_id: user.id
       }
     ]);
@@ -189,7 +190,7 @@ export default function Home() {
             </button>
 
             <form
-              onSubmit={addBookmark}
+              onClick={addBookmark}
               className="flex flex-col gap-3 mb-5">
 
               <input
