@@ -1,40 +1,34 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/pages/api-reference/create-next-app).
+# Smart Bookmark Manager
 
-## Getting Started
+## Project Description
+Smart Bookmark Manager is a web application that allows users to store bookmarks and perform operations like adding, editing, and deleting them. It is built using **Next.js**, **Supabase**, and **Google OAuth** for authentication.
 
-First, run the development server:
+## Technologies Used
+- Next.js
+- Supabase
+- Google OAuth
+- JavaScript, HTML, CSS
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+Problems Faced & Solutions
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+1. Problem:I initially struggled with Next.js as I didn’t have much knowledge about it.  
+   Solution: I took help from ChatGPT and guidance from my brother to understand the framework line by line, which made it easier to implement features.
 
-You can start editing the page by modifying `pages/index.js`. The page auto-updates as you edit the file.
+2. Problem: I had no prior experience with Supabase and didn’t know how to set up tables or interact with the database.  
+   Solution: By following step-by-step guidance, I learned how to create tables and manage data in Supabase successfully.
 
-[API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.js`.
+3. Problem: Google OAuth was also new to me and I didn’t know how to integrate it for login functionality.  
+   Solution: With external help and careful study, I understood the authentication flow and implemented Google login in my project.
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) instead of React pages.
+Through persistence and learning, I overcame these challenges and successfully completed the project.
 
-This project uses [`next/font`](https://nextjs.org/docs/pages/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+ How to Use / Run the Project
+1. Login using your Google account.  
+2. Add bookmarks by entering a title and URL.  
+3. Edit bookmarks to update the title or URL.  
+4. Delete bookmarks that are no longer needed.
 
-## Learn More
+Experience Summary
+This project helped me gain hands-on experience with Next.js, Supabase, and Google OAuth. Understanding the technologies step by step allowed me to complete the project successfully.
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn-pages-router) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/pages/building-your-application/deploying) for more details.
+Thank you.
