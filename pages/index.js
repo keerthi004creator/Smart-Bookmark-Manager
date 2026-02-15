@@ -92,16 +92,17 @@ export default function Home() {
         user_id: user.id
       }
     ]);
-
+  console.log("Insert result:", data, error );
   if (error) {
     console.error("Insert error:", error);
-  } else {
-    console.log("Bookmark added:", data);
+    alert(error.message);
+    return;
+  }
     setTitle("");
     setUrl("");
     fetchBookmark(user);
   }
-}
+
 
   // ✅ Delete Bookmark
   async function deleteBookmark(id) {
