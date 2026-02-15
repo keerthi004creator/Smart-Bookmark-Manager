@@ -94,6 +94,7 @@ export default function Home() {
       setUrl("");
       fetchBookmark(user);
     }
+    else console.log("Insert error:", error);
   }
 
 //   const addBookmark = async (link) => {
