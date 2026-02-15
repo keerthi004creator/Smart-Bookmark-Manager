@@ -190,7 +190,7 @@ export default function Home() {
             </button>
 
             <form
-              onClick={addBookmark}
+              onSubmit={addBookmark}
               className="flex flex-col gap-3 mb-5">
 
               <input
@@ -207,7 +207,9 @@ export default function Home() {
                 onChange={(e) => setUrl(e.target.value)}
               />
 
-              <button className="bg-purple-600 text-white py-2 rounded-lg">
+              <button
+                  type="submit"
+                  className="bg-purple-600 text-white py-2 rounded-lg">
                 Add Bookmark
               </button>
             </form>
