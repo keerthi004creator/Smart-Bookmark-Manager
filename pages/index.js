@@ -6,200 +6,263 @@ export default function Home() {
   const [user, setUser] = useState(null);
   const [title, setTitle] = useState("");
   const [url, setUrl] = useState("");
-  const [bookmark, setbookmark] = useState([]);
+  const [bookmark, setBookmark] = useState([]);
   const [editId, setEditId] = useState(null);
   const [editTitle, setEditTitle] = useState("");
   const [editUrl, setEditUrl] = useState("");
 
-  // 🔹 Get Logged-in User
+  // ✅ Get session correctly (IMPORTANT FOR VERCEL)
   useEffect(() => {
-    getUser();
+
+  
+    const getSession = async () => {
+      const { data: { session } } =
+        await supabase.auth.getSession();
+
+      setUser(session?.user ?? null);
+
+      if (session?.user) {
+        fetchBookmark(session.user);
+      }
+    };
+
+    getSession();
+
+    const { data: listener } =
+      supabase.auth.onAuthStateChange((_event, session) => {
+        setUser(session?.user ?? null);
+
+        if (session?.user) {
+          fetchBookmark(session.user);
+        }
+      });
+
+    return () => {
+      listener.subscription.unsubscribe();
+    };
+
   }, []);
 
-  async function getUser() {
-    const { data: { user } } = await supabase.auth.getUser();
-    setUser(user);
-    fetchbookmark(user);
+  // ✅ Google Login
+  async function signInWithGoogle() {
+    await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: window.location.origin
+      }
+    });
   }
 
-  // 🔹 Fetch bookmark
-  async function fetchbookmark(user) {
-    if (!user) return;
+  // ✅ Logout
+  async function logout() {
+    await supabase.auth.signOut();
+    setUser(null);
+    setBookmark([]);
+  }
 
+  // ✅ Fetch bookmarks
+  async function fetchBookmark(user) {
     const { data, error } = await supabase
       .from("bookmark")
       .select("*")
       .eq("user_id", user.id);
 
-    if (!error) {
-      setbookmark(data);
-    }
+    if (!error) setBookmark(data);
   }
 
-  // 🔹 Add Bookmark
-  async function addBookmark(e) {
-    e.preventDefault();
+  // ✅ Add Bookmark
+  // async function addBookmark(e) {
+  //   e.preventDefault();
 
-    const { data: { user } } = await supabase.auth.getUser();
+  //   if (!title || !url) {
+  //     alert("Enter Title and URL");
+  //     return;
+  //   }
 
-    if (!title || !url) {
-      alert("Enter both Title and URL");
-      return;
-    }
+  //   const { error } = await supabase
+  //     .from("bookmark")
+  //     .insert([
+  //       {
+  //         title,
+  //         url,
+  //         user_id: user.id
+  //       }
+  //     ]);
 
-    const { error } = await supabase.from("bookmark").insert([
+  //   if (!error) {
+  //     setTitle("");
+  //     setUrl("");
+  //     fetchBookmark(user);
+  //   }
+  // }
+
+  const addBookmark = async (link) => {
+  // 1️⃣ Get logged-in user
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+
+  if (userError || !user) {
+    console.log("User not logged in");
+    return;
+  }
+
+  // 2️⃣ Insert bookmark with user_id
+  const { data, error } = await supabase
+    .from("bookmark")
+    .insert([
       {
-        title: title,
-        url: url,
+        url: link,
         user_id: user.id
       }
     ]);
 
-    if (!error) {
-      setTitle("");
-      setUrl("");
-      fetchbookmark(user);
-    }
+  if (error) {
+    console.error("Insert error:", error);
+  } else {
+    console.log("Bookmark added:", data);
   }
+};
 
-  // 🔹 Delete Bookmark
+
+  // ✅ Delete Bookmark
   async function deleteBookmark(id) {
-
-    const { data: { user } } = await supabase.auth.getUser();
-
-    const { error } = await supabase
+    await supabase
       .from("bookmark")
       .delete()
       .eq("id", id)
       .eq("user_id", user.id);
 
-    if (error) {
-      console.log(error);
-      return;
-    }
-
-    fetchbookmark(user);
+    fetchBookmark(user);
   }
 
-  function startEdit(bookmark) {
-  setEditId(bookmark.id);
-  setEditTitle(bookmark.title);
-  setEditUrl(bookmark.url);
+  function startEdit(b) {
+    setEditId(b.id);
+    setEditTitle(b.title);
+    setEditUrl(b.url);
   }
 
-  // 🔹 Update Bookmark
-async function updateBookmark() {
+  // ✅ Update Bookmark
+  async function updateBookmark() {
+    await supabase
+      .from("bookmark")
+      .update({
+        title: editTitle,
+        url: editUrl
+      })
+      .eq("id", editId)
+      .eq("user_id", user.id);
 
-  const { data: { user } } = await supabase.auth.getUser();
-
-  const { error } = await supabase
-    .from("bookmark")
-    .update({
-      title: editTitle,
-      url: editUrl
-    })
-    .eq("id", editId)
-    .eq("user_id", user.id);
-
-  if (error) {
-    console.log(error);
-    return;
+    setEditId(null);
+    fetchBookmark(user);
   }
 
-  setEditId(null);
-  fetchbookmark(user);
-}
- 
   return (
-  <div className="min-h-screen bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center">
+    <div className="min-h-screen bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center">
 
-    <div className="bg-white p-8 rounded-2xl shadow-2xl w-[500px]">
+      <div className="bg-white p-8 rounded-2xl shadow-2xl w-[500px]">
 
-      <h1 className="text-2xl font-bold text-center mb-2">
-        Smart Bookmark Manager
-      </h1>  
+        <h1 className="text-2xl font-bold text-center mb-4">
+          Smart Bookmark Manager
+        </h1>
 
-      <h2 className="text-2xl font-bold mb-4 text-center">
-        Welcome {user?.email}
-      </h2>
+        {/* ✅ LOGIN SCREEN */}
+        {!user && (
+          <div className="text-center">
+            <button
+              onClick={signInWithGoogle}
+              className="bg-red-500 text-white px-4 py-2 rounded-lg">
+              Login with Google
+            </button>
+          </div>
+        )}
 
-      <form onSubmit={addBookmark} className="flex flex-col gap-3 mb-5">
+        {/* ✅ APP SCREEN */}
+        {user && (
+          <>
+            <h2 className="text-center mb-4">
+              Welcome {user.email}
+            </h2>
 
-        <input
-          className="border p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-400"
-          placeholder="Title"
-          onChange={(e) => setTitle(e.target.value)}
-        />
-        <br></br>
-        <input
-          className="border p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-400"
-          placeholder="URL"
-          onChange={(e) => setUrl(e.target.value)}
-        />
-        <br></br>
-        <button
-          className="bg-purple-600 text-white py-2 rounded-lg hover:bg-purple-700 transition">
-          Add Bookmark
-        </button>
+            <button
+              onClick={logout}
+              className="bg-gray-800 text-white px-3 py-1 rounded mb-4">
+              Logout
+            </button>
 
-      </form>
+            <form
+              onSubmit={addBookmark}
+              className="flex flex-col gap-3 mb-5">
 
-      <ul className="space-y-3">
+              <input
+                className="border p-2 rounded-lg"
+                placeholder="Title"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+              />
 
-        {bookmark?.map((b) => (
-          <li key={b.id} className="flex justify-between items-center bg-gray-100 p-3 rounded-lg">
+              <input
+                className="border p-2 rounded-lg"
+                placeholder="URL"
+                value={url}
+                onChange={(e) => setUrl(e.target.value)}
+              />
 
-            {editId === b.id ? (
-              <>
-                <input
-                  className="border p-1 rounded"
-                  value={editTitle}
-                  onChange={(e) => setEditTitle(e.target.value)}
-                />
+              <button className="bg-purple-600 text-white py-2 rounded-lg">
+                Add Bookmark
+              </button>
+            </form>
 
-                <input
-                  className="border p-1 rounded"
-                  value={editUrl}
-                  onChange={(e) => setEditUrl(e.target.value)}
-                />
+            <ul className="space-y-3">
+              {bookmark.map((b) => (
+                <li key={b.id}
+                  className="flex justify-between items-center bg-gray-100 p-3 rounded-lg">
 
-                <button
-                  className="bg-green-500 text-white px-2 py-1 rounded"
-                  onClick={updateBookmark}>
-                  Save
-                </button>
-              </>
-            ) : (
-              <>
-                <a
-                  href={b.url}
-                  target="_blank"
-                  className="text-blue-600 underline">
-                  {b.title}
-                </a>
+                  {editId === b.id ? (
+                    <>
+                      <input
+                        value={editTitle}
+                        onChange={(e) => setEditTitle(e.target.value)}
+                        className="border p-1 rounded"
+                      />
+                      <input
+                        value={editUrl}
+                        onChange={(e) => setEditUrl(e.target.value)}
+                        className="border p-1 rounded"
+                      />
+                      <button
+                        onClick={updateBookmark}
+                        className="bg-green-500 text-white px-2 py-1 rounded">
+                        Save
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <a href={b.url}
+                         target="_blank"
+                         className="text-blue-600 underline">
+                        {b.title}
+                      </a>
 
-                <div className="flex gap-2">
-                  <button
-                    className="bg-yellow-400 px-2 py-1 rounded"
-                    onClick={() => startEdit(b)}>
-                    Edit
-                  </button>
-                  <button
-                    className="bg-red-500 text-white px-2 py-1 rounded"
-                    onClick={() => deleteBookmark(b.id)}>
-                    Delete
-                  </button>
-                </div>
-              </>
-            )}
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => startEdit(b)}
+                          className="bg-yellow-400 px-2 py-1 rounded">
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => deleteBookmark(b.id)}
+                          className="bg-red-500 text-white px-2 py-1 rounded">
+                          Delete
+                        </button>
+                      </div>
+                    </>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
 
-          </li>
-        ))}
-
-      </ul>
-
+      </div>
     </div>
-
-  </div>
-);
+  );
 }
