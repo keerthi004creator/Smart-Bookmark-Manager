@@ -71,57 +71,57 @@ export default function Home() {
   }
 
   // ✅ Add Bookmark
-  // async function addBookmark(e) {
-  //   e.preventDefault();
+  async function addBookmark(link) {
+    link.preventDefault();
 
-  //   if (!title || !url) {
-  //     alert("Enter Title and URL");
-  //     return;
-  //   }
+    if (!title || !url) {
+      alert("Enter Title and URL");
+      return;
+    }
 
-  //   const { error } = await supabase
-  //     .from("bookmark")
-  //     .insert([
-  //       {
-  //         title,
-  //         url,
-  //         user_id: user.id
-  //       }
-  //     ]);
+    const { error } = await supabase
+      .from("bookmark")
+      .insert([
+        {
+          title,
+          url,
+          user_id: user.id
+        }
+      ]);
 
-  //   if (!error) {
-  //     setTitle("");
-  //     setUrl("");
-  //     fetchBookmark(user);
-  //   }
-  // }
-
-  const addBookmark = async (link) => {
-  // 1️⃣ Get logged-in user
-  const { data: {  }, error: userError } = await supabase.auth.getUser();
-
-  if (userError || !user) {
-    console.log("User not logged in");
-    return;
+    if (!error) {
+      setTitle("");
+      setUrl("");
+      fetchBookmark(user);
+    }
   }
 
-  // 2️⃣ Insert bookmark with user_id
-  const { data:  { user }} = await supabase.auth.getUser();
+//   const addBookmark = async (link) => {
+//   // 1️⃣ Get logged-in user
+//   const { data: {  }, error: userError } = await supabase.auth.getUser();
 
-  await supabase.from("bookmark").insert([
-      {
-        title:title,
-        url: url,
-        user_id: user.id
-      }
-    ]);
+//   if (userError || !user) {
+//     console.log("User not logged in");
+//     return;
+//   }
 
-  if (error) {
-    console.error("Insert error:", error);
-  } else {
-    console.log("Bookmark added:", data);
-  }
-};
+//   // 2️⃣ Insert bookmark with user_id
+//   const { data:  { user }} = await supabase.auth.getUser();
+
+//   await supabase.from("bookmark").insert([
+//       {
+//         title:title,
+//         url: url,
+//         user_id: user.id
+//       }
+//     ]);
+
+//   if (error) {
+//     console.error("Insert error:", error);
+//   } else {
+//     console.log("Bookmark added:", data);
+//   }
+// };
 
 
   // ✅ Delete Bookmark
