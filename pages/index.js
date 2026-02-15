@@ -70,47 +70,24 @@ export default function Home() {
     if (!error) setBookmark(data);
   }
 
-  // ✅ Add Bookmark
-  // async function addBookmark(e) {
-  //   e.preventDefault();
+  async function addBookmark(e) {
+  e.preventDefault();
 
-  //   if (!title || !url) {
-  //     alert("Enter Title and URL");
-  //     return;
-  //   }
-
-  //   const { error } = await supabase
-  //     .from("bookmark")
-  //     .insert([
-  //       {
-  //         title,
-  //         url,
-  //         user_id: user.id
-  //       }
-  //     ]);
-
-  //   if (!error) {
-  //     setTitle("");
-  //     setUrl("");
-  //     fetchBookmark(user);
-  //   }
-  // }
-
-  const addBookmark = async (link) => {
-  // 1️⃣ Get logged-in user
-  const { data: {  }, error: userError } = await supabase.auth.getUser();
-
-  if (userError || !user) {
-    console.log("User not logged in");
+  if (!title || !url) {
+    alert("Enter Title and URL");
     return;
   }
 
-  // 2️⃣ Insert bookmark with user_id
-  const { data:  { user }} = await supabase.auth.getUser();
+  if (!user) {
+    alert("User not logged in");
+    return;
+  }
 
-  await supabase.from("bookmark").insert([
+  const { data, error } = await supabase
+    .from("bookmark")
+    .insert([
       {
-        title:title,
+        title: title,
         url: url,
         user_id: user.id
       }
@@ -120,9 +97,11 @@ export default function Home() {
     console.error("Insert error:", error);
   } else {
     console.log("Bookmark added:", data);
+    setTitle("");
+    setUrl("");
+    fetchBookmark(user);
   }
-};
-
+}
 
   // ✅ Delete Bookmark
   async function deleteBookmark(id) {
@@ -190,7 +169,7 @@ export default function Home() {
             </button>
 
             <form
-              onClick={addBookmark}
+              onSubmit={addBookmark}
               className="flex flex-col gap-3 mb-5">
 
               <input
@@ -207,7 +186,9 @@ export default function Home() {
                 onChange={(e) => setUrl(e.target.value)}
               />
 
-              <button className="bg-purple-600 text-white py-2 rounded-lg">
+              <button 
+              type="submit"
+              className="bg-purple-600 text-white py-2 rounded-lg">
                 Add Bookmark
               </button>
             </form>
